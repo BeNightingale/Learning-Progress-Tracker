@@ -53,16 +53,16 @@ public class Student {
         if (isEmailInvalid(email)) {
             System.out.println("Incorrect email.");
             return null;
-        } else if (Main.emailAddresses.contains(email)) {
+        } else if (CliUtil.emailAddresses.contains(email)) {
             System.out.println("This email is already taken.");
             return null;
         } else {
             student.email = email;
-            Main.emailAddresses.add(email);
+            CliUtil.emailAddresses.add(email);
         }
         long randomNumber = (long) (Math.random() * 100_000L);
         student.id = String.valueOf(randomNumber);
-        Main.studentsIdsList.add(String.valueOf(randomNumber));
+        CliUtil.studentsIdsList.add(String.valueOf(randomNumber));
         student.setCoursesMap();
         return student;
     }
