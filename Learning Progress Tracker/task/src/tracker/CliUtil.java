@@ -9,6 +9,7 @@ public class CliUtil {
     private static final String INCORRECT_CREDENTIALS = "Incorrect credentials.";
     private static final String ENTER_EXIT_TO_EXIT_THE_PROGRAM = "Enter 'exit' to exit the program";
     private static final String RETURN = "return";
+    private static final String STATISTICS = "statistics";
 
     protected static final List<String> emailAddresses = new ArrayList<>();
     protected static final List<String> studentsIdsList = new ArrayList<>();
@@ -17,10 +18,38 @@ public class CliUtil {
     private CliUtil() {
     }
 
-    public static void  addStudents(String input, Scanner scanner) {
+    public static void addStudents(String input, Scanner scanner) {
         if (input.isBlank()) {
             System.out.println("No input.");
             input = scanner.nextLine();
+        } else if (STATISTICS.equals(input)) { // potem back lub inne nie ma
+            statistics();
+            input = scanner.nextLine();
+            if ("back".equals(input)) {
+                input = scanner.nextLine();
+                if ("back".equals(input)) {
+                    System.out.println(ENTER_EXIT_TO_EXIT_THE_PROGRAM);
+                    input = scanner.nextLine();
+                    if ("exit".equals(input)) {
+                        System.out.println("Bye!");
+                        return;
+                    }
+                }
+                if ("exit".equals(input)) {
+                    System.out.println("Bye!");
+                    return;
+                }
+            } else {
+                while (!"back".equals(input)) {
+                    courseNameCommand(input);
+                    input = scanner.nextLine();
+                }
+                input = scanner.nextLine();
+                if ("exit".equals(input)) {
+                    System.out.println("Bye!");
+                    return;
+                }
+            }
         } else if ("find".equals(input)) {
             find(scanner);
             input = scanner.nextLine();
@@ -46,13 +75,54 @@ public class CliUtil {
                 }
             } else if ("find".equals(input)) {
                 find(scanner);
+            } else if (STATISTICS.equals(input)) {
+                statistics();
+                input = scanner.nextLine(); // potem back lub inne nie ma
+                if ("back".equals(input)) {
+                    input = scanner.nextLine();
+                    if ("exit".equals(input)) {
+                        System.out.println("Bye!");
+                        return;
+                    }
+                } else {
+                    while (!"back".equals(input)) {
+                        courseNameCommand(input);
+                        input = scanner.nextLine();
+                    }
+                    input = scanner.nextLine();
+                    if ("exit".equals(input)) {
+                        System.out.println("Bye!");
+                        return;
+                    }
+                }
             }
         } else if ("exit".equals(input)) {
             System.out.println("Bye!");
             return;
-        } else if (!"add students".equals(input)){
+        } else if (!"add students".equals(input)) {
             System.out.println("Unknown command!");
             input = scanner.nextLine();
+            if (STATISTICS.equals(input)) {
+                statistics();
+                input = scanner.nextLine(); // potem back lub inne nie ma
+                if ("back".equals(input)) {
+                    input = scanner.nextLine();
+                    if ("exit".equals(input)) {
+                        System.out.println("Bye!");
+                        return;
+                    }
+                } else {
+                    while (!"back".equals(input)) {
+                        courseNameCommand(input);
+                        input = scanner.nextLine();
+                    }
+                    input = scanner.nextLine();
+                    if ("exit".equals(input)) {
+                        System.out.println("Bye!");
+                        return;
+                    }
+                }
+            }
         }
         while (!"exit".equals(input)) {
             if (input.equals("add students")) {
@@ -60,16 +130,22 @@ public class CliUtil {
                 input = scanner.nextLine();
                 if ("back".equals(input)) {
                     input = backAfterCredentials(scanner);
+                    if (RETURN.equals(input)) {
+                        return;
+                    }
                 } else if ("exit".equals(input)) {
                     System.out.println(INCORRECT_CREDENTIALS);
                     input = scanner.nextLine();
                 } else {
-                    verifyInput(input);
+                    verifyInputCredentials(input);
                     input = scanner.nextLine();
                 }
             }
             if ("back".equals(input)) {
                 input = backAfterCredentials(scanner);
+                if (RETURN.equals(input)) {
+                    return;
+                }
                 if ("exit".equals(input)) {
                     System.out.println("Bye!");
                     return;
@@ -78,14 +154,14 @@ public class CliUtil {
                 if (RETURN.equals(input))
                     return;
             } else {
-                verifyInput(input);
+                verifyInputCredentials(input);
             }
             input = scanner.nextLine();
         }
         System.out.println("Bye!");
     }
 
-    private static void verifyInput(String input) {
+    private static void verifyInputCredentials(String input) {
         int firstIndexOfSpace = input.indexOf(" ");
         String firstName;
         String lastNameAndEmail;
@@ -127,6 +203,26 @@ public class CliUtil {
             if ("find".equals(input)) {
                 find(scanner);
                 input = scanner.nextLine();
+            } else if (STATISTICS.equals(input)) {
+                statistics();
+                input = scanner.nextLine();
+                if ("back".equals(input)) {
+                    input = scanner.nextLine();
+                    if ("exit".equals(input)) {
+                        System.out.println("Bye!");
+                        return RETURN;
+                    }
+                } else {
+                    while (!"back".equals(input)) {
+                        courseNameCommand(input);
+                        input = scanner.nextLine();
+                    }
+                    input = scanner.nextLine();
+                    if ("exit".equals(input)) {
+                        System.out.println("Bye!");
+                        return RETURN;
+                    }
+                }
             }
         }
         return input;
@@ -171,15 +267,15 @@ public class CliUtil {
         if (isPointsInputValid(numbers)) {
             Student student = getStudentById(numbers[0]);
             if (student != null) {
-                student.updateScore(Integer.parseInt(numbers[1]), Integer.parseInt(numbers[2]),
-                        Integer.parseInt(numbers[3]), Integer.parseInt(numbers[4]));
+                student.updateScore(Long.parseLong(numbers[1]), Long.parseLong(numbers[2]),
+                        Long.parseLong(numbers[3]), Long.parseLong(numbers[4]));
                 System.out.println("Points updated.");
             }
         }
     }
 
     private static boolean isPointsInputValid(String[] numbers) {
-        if (numbers == null || numbers.length == 0){
+        if (numbers == null || numbers.length == 0) {
             return false;
         }
         String studentId = numbers[0];
@@ -201,13 +297,13 @@ public class CliUtil {
         return true;
     }
 
-    private static Student getStudentById(String id) {
+    protected static Student getStudentById(String id) {
         for (Student student : studentsList) {
             if (id.equals(student.getId())) {
                 return student;
             }
         }
-        return  null;
+        return null;
     }
 
     private static String checkBackAndExit(String input, Scanner scanner) {
@@ -220,5 +316,30 @@ public class CliUtil {
             }
         }
         return input;
+    }
+
+    private static void statistics() {
+        System.out.println("Type the name of a course to see details or 'back' to quit:");
+        System.out.println(Statistics.showStatistics());
+
+    }
+
+    private static void courseNameCommand(String courseName) {  // powtórz aż do back , na końcu weż nowy input
+        if (courseName == null || courseName.isEmpty()) {
+            System.out.println("Unknown course.");
+            return;
+        }
+        Course courseToShow = null;
+        for (Course course : Statistics.courseList) {
+            if (courseName.equalsIgnoreCase(course.getCourseName().nameAsString())) {
+                courseToShow = course;
+                break;
+            }
+        }
+        if (courseToShow == null) {
+            System.out.println("Unknown course.");
+            return;
+        }
+        courseToShow.showCourseResults();
     }
 }
